@@ -8,6 +8,7 @@ The app is designed for the early stage where you watch Japanese lessons, ask Ge
 
 - Type answers in romaji while learning kana.
 - Import lesson JSON from Gemini, Grok, or handwritten notes.
+- Copy the YouTube Gemini extraction prompt from the Import screen or from `docs/LESSON_EXTRACTION_PROMPT.md`.
 - Save lessons and study progress locally in IndexedDB.
 - Let Aya react to correct and wrong answers with sprites and comic-style bubbles.
 - Keep the app usable without any backend or API key.
@@ -46,4 +47,3 @@ See [docs/PROJECT_BRIEF.md](docs/PROJECT_BRIEF.md).
 ## License
 
 MIT
-

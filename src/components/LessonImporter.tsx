@@ -3,6 +3,7 @@ import { Button } from "@hexnest/ui";
 import { useMemo, useState } from "react";
 import type { AyaCue, LessonRecord } from "../domain/types";
 import { sampleLessonJson } from "../domain/sampleLesson";
+import { youtubeGeminiLessonPrompt } from "../domain/extractionPrompt";
 import { buildStudyCards, parseLessonJson } from "../services/importer";
 import { saveLessonWithCards } from "../storage/db";
 
@@ -59,6 +60,33 @@ export function LessonImporter({ onImported, onCue }: LessonImporterProps) {
     onCue({ mood: "thinking", bubble: "File loaded. Run preview before saving it." });
   }
 
+  async function copyText(value: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async function copyGeminiPrompt(): Promise<void> {
+    const copied = await copyText(youtubeGeminiLessonPrompt);
+    onCue(
+      copied
+        ? { mood: "success", bubble: "Prompt copied. Paste it into YouTube Gemini and bring the JSON back here." }
+        : { mood: "warning", bubble: "Clipboard is blocked here. Open docs/LESSON_EXTRACTION_PROMPT.md and copy the prompt manually." }
+    );
+  }
+
+  async function copySample(): Promise<void> {
+    const copied = await copyText(JSON.stringify(sampleLessonJson, null, 2));
+    onCue(
+      copied
+        ? { mood: "success", bubble: "Sample JSON copied." }
+        : { mood: "warning", bubble: "Clipboard is blocked here. The sample is already loaded in the editor." }
+    );
+  }
+
   return (
     <section className="work-panel importer-panel">
       <div className="panel-head">
@@ -85,7 +113,11 @@ export function LessonImporter({ onImported, onCue }: LessonImporterProps) {
       />
 
       <div className="actions-row">
-        <Button type="button" variant="ghost" onClick={() => void navigator.clipboard.writeText(JSON.stringify(sampleLessonJson, null, 2))}>
+        <Button type="button" variant="ghost" onClick={() => void copyGeminiPrompt()}>
+          <Clipboard size={16} />
+          Copy YouTube Prompt
+        </Button>
+        <Button type="button" variant="ghost" onClick={() => void copySample()}>
           <Clipboard size={16} />
           Copy Sample
         </Button>
