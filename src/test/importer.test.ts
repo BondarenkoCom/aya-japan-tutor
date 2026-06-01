@@ -20,4 +20,22 @@ describe("lesson importer", () => {
     expect(lesson.theory).toHaveLength(1);
     expect(buildStudyCards(lesson)).toHaveLength(3);
   });
+
+  it("parses Gemini pipe vocabulary tables and creates two-way cards", () => {
+    const lesson = parseLessonJson(
+      [
+        "Japanese | Romaji | English",
+        "\u3053\u308c | kore | this",
+        "\u305d\u308c | sore | that",
+        "\u672c | hon | book"
+      ].join("\n")
+    );
+    const cards = buildStudyCards(lesson);
+
+    expect(lesson.title).toBe("Imported YouTube vocabulary");
+    expect(lesson.vocabulary).toHaveLength(3);
+    expect(lesson.quiz).toHaveLength(3);
+    expect(cards).toHaveLength(6);
+    expect(cards.some((card) => card.prompt === "Type romaji for: this")).toBe(true);
+  });
 });

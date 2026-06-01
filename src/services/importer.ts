@@ -148,6 +148,70 @@ function unwrapLesson(value: unknown): z.infer<typeof LessonSchema> {
   return LessonSchema.parse(candidate);
 }
 
+function looksLikePipeTable(raw: string): boolean {
+  return raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .some((line) => line.includes("|") && line.split("|").length >= 3);
+}
+
+function isHeaderOrDivider(columns: string[]): boolean {
+  const joined = columns.join(" ").toLowerCase();
+  if (columns.every((column) => /^-+$/.test(column.replace(/\s/g, "")))) return true;
+  return joined.includes("japanese") && joined.includes("romaji") && joined.includes("english");
+}
+
+function parsePipeVocabulary(raw: string): LessonRecord {
+  const now = new Date().toISOString();
+  const vocabulary = raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && line.includes("|"))
+    .map((line) => line.split("|").map((column) => column.trim()))
+    .filter((columns) => columns.length >= 3 && !isHeaderOrDivider(columns))
+    .map(([japanese, romaji, meaning]) => ({
+      id: makeId("vocab"),
+      kana: japanese,
+      kanji: "",
+      romaji,
+      meaning,
+      note: ""
+    }))
+    .filter((item) => item.kana && item.romaji && item.meaning);
+
+  if (vocabulary.length === 0) {
+    throw new Error("No valid rows found. Expected lines like: Japanese | Romaji | English");
+  }
+
+  return {
+    id: makeId("lesson"),
+    title: "Imported YouTube vocabulary",
+    source: { type: "youtube" },
+    teacher: undefined,
+    level: "absolute-beginner",
+    summary: `Imported ${vocabulary.length} Japanese study items from a YouTube/Gemini table.`,
+    theory: [
+      {
+        id: makeId("theory"),
+        heading: "Imported vocabulary",
+        body: "This lesson was imported from a simple Japanese | Romaji | English table. Practice both Japanese -> romaji and English -> romaji recall."
+      }
+    ],
+    examples: [],
+    vocabulary,
+    quiz: vocabulary.map((item) => ({
+      id: makeId("quiz"),
+      prompt: `Type romaji for: ${item.meaning}`,
+      answer: item.romaji,
+      hint: `Japanese: ${item.kana}`
+    })),
+    tags: ["youtube", "gemini-table", "romaji"],
+    createdAt: now,
+    updatedAt: now
+  };
+}
+
 function normalizeTheory(raw: z.infer<typeof LessonSchema>): LessonRecord["theory"] {
   const source = [
     ...(raw.theory ?? []),
@@ -207,8 +271,21 @@ function normalizeQuiz(raw: z.infer<typeof LessonSchema>): LessonRecord["quiz"] 
 }
 
 export function parseLessonJson(raw: string): LessonRecord {
+  if (looksLikePipeTable(raw) && !raw.trim().startsWith("{")) {
+    return parsePipeVocabulary(raw);
+  }
+
   const jsonText = extractJsonText(raw);
-  const parsed = JSON.parse(jsonText) as unknown;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonText) as unknown;
+  } catch (error) {
+    if (looksLikePipeTable(raw)) {
+      return parsePipeVocabulary(raw);
+    }
+    throw error;
+  }
+
   const wrapped = WrapperSchema.parse(parsed);
   const lesson = unwrapLesson(wrapped);
   const now = new Date().toISOString();

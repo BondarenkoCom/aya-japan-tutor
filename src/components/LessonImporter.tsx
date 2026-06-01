@@ -28,7 +28,7 @@ export function LessonImporter({ onImported, onCue }: LessonImporterProps) {
       setPreview(null);
       const message = err instanceof Error ? err.message : "Invalid JSON";
       setError(message);
-      onCue({ mood: "wrong", bubble: "The JSON does not match a lesson shape yet. Fix it or paste a cleaner export." });
+      onCue({ mood: "wrong", bubble: "The input does not match JSON or Japanese | Romaji | English table format yet." });
     }
   }
 
@@ -42,7 +42,7 @@ export function LessonImporter({ onImported, onCue }: LessonImporterProps) {
       } catch (err) {
         const message = err instanceof Error ? err.message : "Invalid JSON";
         setError(message);
-        onCue({ mood: "wrong", bubble: "The JSON does not match a lesson shape yet. Fix it before saving." });
+        onCue({ mood: "wrong", bubble: "The input does not match JSON or table format yet. Fix it before saving." });
         return;
       }
     }
@@ -73,7 +73,7 @@ export function LessonImporter({ onImported, onCue }: LessonImporterProps) {
     const copied = await copyText(youtubeGeminiLessonPrompt);
     onCue(
       copied
-        ? { mood: "success", bubble: "Prompt copied. Paste it into YouTube Gemini and bring the JSON back here." }
+        ? { mood: "success", bubble: "Prompt copied. Paste it into YouTube Gemini and bring the table back here." }
         : { mood: "warning", bubble: "Clipboard is blocked here. Open docs/LESSON_EXTRACTION_PROMPT.md and copy the prompt manually." }
     );
   }
@@ -92,7 +92,7 @@ export function LessonImporter({ onImported, onCue }: LessonImporterProps) {
       <div className="panel-head">
         <div>
           <p className="eyebrow">Lesson Intake</p>
-          <h2>Paste Gemini / Grok JSON</h2>
+          <h2>Paste Gemini table or JSON</h2>
         </div>
         <label className="file-button">
           <FileJson size={16} />
