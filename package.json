@@ -1,0 +1,52 @@
+{
+  "name": "aya-japan-tutor",
+  "version": "0.1.0",
+  "description": "HexNest-powered local-first Japanese learning app with Aya as an interactive tutor.",
+  "license": "MIT",
+  "author": "Artem Bondarenko (BondarenkoCom)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "typecheck": "tsc -b --pretty false"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BondarenkoCom/aya-japan-tutor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BondarenkoCom/aya-japan-tutor/issues"
+  },
+  "homepage": "https://github.com/BondarenkoCom/aya-japan-tutor#readme",
+  "keywords": [
+    "japanese",
+    "romaji",
+    "kana",
+    "flashcards",
+    "indexeddb",
+    "hexnest",
+    "aya-9x",
+    "react",
+    "vite"
+  ],
+  "dependencies": {
+    "@hexnest/ui": "^0.3.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "dexie": "^4.2.1",
+    "lucide-react": "^1.7.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.4",
+    "vitest": "^4.1.1"
+  }
+}
+
